@@ -1,9 +1,9 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/src/lib/prisma";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
@@ -30,6 +30,7 @@ const handler = NextAuth({
           email: user.email,
           name: user.name,
           organizationId: user.organizationId,
+          role: user.role,
         };
       },
     }),
@@ -38,12 +39,14 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.organizationId = (user as any).organizationId;
+        token.role = (user as any).role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).organizationId = token.organizationId;
+        (session.user as any).role = token.role;
       }
       return session;
     },
@@ -51,7 +54,9 @@ const handler = NextAuth({
   pages: {
     signIn: "/login",
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
 
