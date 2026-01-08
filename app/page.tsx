@@ -48,6 +48,23 @@ export default function HomePage() {
             leadership teams across large and growing organizations.
           </p>
 
+          {/* VIEW PRODUCT PREVIEW (STRICTLY GATED) */}
+          <div className="mt-8">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                alert(
+                  "🔒 Product preview is available during a guided enterprise demo.\n\nWe demonstrate AnkismaikT live to ensure proper context, clarity, and correct interpretation of executive signals."
+                );
+              }}
+              className="rounded-xl border border-gray-300 dark:border-slate-700 px-5 py-2 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
+            >
+              View Product Preview
+            </button>
+          </div>
+
           {/* ENTERPRISE DEMO FORM */}
           <div className="mt-12 max-w-lg rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-lg ring-1 ring-gray-200 dark:ring-slate-800">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-200">
