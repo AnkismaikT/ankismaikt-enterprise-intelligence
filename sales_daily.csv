@@ -1,0 +1,6 @@
+date,region,sku,sales_amount,units_sold
+2025-12-01,North,SKU-001,120000,24
+2025-12-01,South,SKU-001,90000,18
+2025-12-01,East,SKU-002,60000,12
+2025-12-02,North,SKU-002,150000,30
+2025-12-02,West,SKU-001,70000,14
