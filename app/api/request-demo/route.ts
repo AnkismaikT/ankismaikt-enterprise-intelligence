@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -26,6 +25,7 @@ export async function POST(req: Request) {
 
     // 2️⃣ Send email ONLY if env vars exist
     if (process.env.RESEND_API_KEY && process.env.DEMO_REQUEST_EMAIL) {
+      const { Resend } = await import("resend"); // 🔑 dynamic import
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       await resend.emails.send({
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         `,
       });
     } else {
-      console.warn("Demo email skipped: missing RESEND_API_KEY or DEMO_REQUEST_EMAIL");
+      console.warn("Demo email skipped: missing env vars");
     }
 
     return NextResponse.json({ success: true });
