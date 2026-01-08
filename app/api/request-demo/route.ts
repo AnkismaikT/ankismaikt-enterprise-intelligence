@@ -3,15 +3,13 @@ import { Resend } from "resend";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
     const { name, email, company, message, website } = body;
 
-    // 🛑 Honeypot protection (bots fill hidden fields)
+    // 🛑 Honeypot protection
     if (website) {
       return NextResponse.json({ success: true });
     }
@@ -26,21 +24,27 @@ export async function POST(req: Request) {
       },
     });
 
-    // 2️⃣ Send email
-    await resend.emails.send({
-      from: "AnkismaikT <demo@ankismaikt.com>",
-      to: [process.env.DEMO_REQUEST_EMAIL!],
-      replyTo: email,
-      subject: "New Enterprise Demo Request",
-      html: `
-        <h2>New Enterprise Demo Request</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Company:</strong> ${company || "-"}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message || "-"}</p>
-      `,
-    });
+    // 2️⃣ Send email ONLY if env vars exist
+    if (process.env.RESEND_API_KEY && process.env.DEMO_REQUEST_EMAIL) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+
+      await resend.emails.send({
+        from: "AnkismaikT <demo@ankismaikt.com>",
+        to: [process.env.DEMO_REQUEST_EMAIL],
+        replyTo: email,
+        subject: "New Enterprise Demo Request",
+        html: `
+          <h2>New Enterprise Demo Request</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Company:</strong> ${company || "-"}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message || "-"}</p>
+        `,
+      });
+    } else {
+      console.warn("Demo email skipped: missing RESEND_API_KEY or DEMO_REQUEST_EMAIL");
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
