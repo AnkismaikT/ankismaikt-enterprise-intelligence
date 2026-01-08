@@ -2,19 +2,21 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors">
       <div className="mx-auto max-w-7xl px-6 py-20">
-        {/* Hero */}
+        {/* Hero Section */}
         <section className="mb-24">
           <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-gray-900 dark:text-slate-100 sm:text-5xl">
-            Enterprise Intelligence for
-            <span className="text-indigo-600 dark:text-indigo-400">
-              {" "}Executive Decisions
-            </span>
+            Enterprise Intelligence for Executive Decisions
           </h1>
 
+          {/* Supporting line (LOCKED positioning) */}
+          <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
+            Built for founders and leadership teams who need faster, more confident decisions.
+          </p>
+
           <p className="mt-6 max-w-3xl text-lg text-gray-600 dark:text-slate-400">
-            AnkismaikT is an enterprise intelligence platform that transforms
-            fragmented business data into clear insights, risk signals, and
-            decision guidance for leadership teams.
+            AnkismaikT is an enterprise intelligence platform that transforms fragmented
+            business data into clear insights, risk signals, and decision guidance for
+            leadership teams across large and growing organizations.
           </p>
 
           <div className="mt-10 flex gap-4">
@@ -34,20 +36,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Who it's for */}
+        {/* Who It's For */}
         <section className="mb-24 grid grid-cols-1 gap-10 md:grid-cols-3">
           {[
             {
               title: "Founders & CEOs",
-              desc: "Single source of truth for company-wide performance, risks, and priorities.",
+              desc: "A single source of truth for company-wide performance, risks, and priorities.",
             },
             {
-              title: "CXOs & Leadership",
-              desc: "Operational intelligence with confidence signals for faster decisions.",
+              title: "CXOs & Leadership Teams",
+              desc: "Executive-level intelligence with confidence signals for faster, aligned decisions.",
             },
             {
-              title: "Strategy & Ops Teams",
-              desc: "Structured insights replacing spreadsheets and manual reporting.",
+              title: "Strategy & Operations",
+              desc: "Structured insights replacing fragmented reports, spreadsheets, and manual reviews.",
             },
           ].map((item) => (
             <div
@@ -72,10 +74,10 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {[
-              "Designed for executive decision-making, not analysts",
-              "Focus on signals, confidence, and impact — not raw charts",
-              "Enterprise-grade UX with clarity and restraint",
-              "Composable platform for internal intelligence systems",
+              "Designed for executive decision-making, not analyst-heavy workflows",
+              "Focuses on signals, confidence, and impact — not just charts",
+              "Enterprise-grade UX built for clarity, restraint, and trust",
+              "Composable intelligence platform adaptable to complex organizations",
             ].map((point) => (
               <div
                 key={point}
@@ -98,8 +100,8 @@ export default function HomePage() {
             Ready to see AnkismaikT in action?
           </h2>
           <p className="mt-2 max-w-xl text-indigo-100">
-            We work with select teams to design enterprise intelligence systems
-            tailored to their organization.
+            We work with select organizations to design enterprise intelligence
+            systems tailored to their leadership and decision-making needs.
           </p>
 
           <div className="mt-6">
