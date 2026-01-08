@@ -1,21 +1,21 @@
 export default function Page() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 px-6 py-8">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-6 py-8 transition-colors">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-10 animate-fade-in">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-slate-100">
             AnkismaikT Enterprise Intelligence
           </h1>
-          <p className="mt-2 max-w-2xl text-gray-600">
+          <p className="mt-2 max-w-2xl text-gray-600 dark:text-slate-400">
             Executive command center for performance, risk, and decisions
           </p>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100">
+            <span className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 px-3 py-1 text-sm font-medium">
               ● Live data • Updated 3 mins ago
             </span>
-            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 transition hover:bg-blue-100">
+            <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 px-3 py-1 text-sm font-medium">
               Data quality: High
             </span>
           </div>
@@ -23,57 +23,24 @@ export default function Page() {
 
         {/* KPI Cards */}
         <section className="mb-12">
-          <h2 className="mb-4 text-lg font-semibold text-gray-800">
+          <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
             Key Performance Indicators
           </h2>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              {
-                title: "Revenue",
-                value: "₹12.4L",
-                change: "+14%",
-                signal: "Above baseline",
-                color: "from-indigo-500 to-indigo-600",
-              },
-              {
-                title: "Cost",
-                value: "₹7.1L",
-                change: "-6%",
-                signal: "Efficiency improved",
-                color: "from-rose-500 to-rose-600",
-              },
-              {
-                title: "Profit",
-                value: "₹5.3L",
-                change: "+22%",
-                signal: "Margin expanding",
-                color: "from-emerald-500 to-emerald-600",
-              },
-              {
-                title: "Growth",
-                value: "+18%",
-                change: "QoQ",
-                signal: "Sustained momentum",
-                color: "from-amber-500 to-amber-600",
-              },
+              { title: "Revenue", value: "₹12.4L", change: "+14%", color: "from-indigo-500 to-indigo-600" },
+              { title: "Cost", value: "₹7.1L", change: "-6%", color: "from-rose-500 to-rose-600" },
+              { title: "Profit", value: "₹5.3L", change: "+22%", color: "from-emerald-500 to-emerald-600" },
+              { title: "Growth", value: "+18%", change: "QoQ", color: "from-amber-500 to-amber-600" },
             ].map((card) => (
               <div
                 key={card.title}
-                className={`group relative rounded-2xl bg-gradient-to-r ${card.color} p-6 text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-within:ring-2 focus-within:ring-white/60`}
+                className={`rounded-2xl bg-gradient-to-r ${card.color} p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl`}
               >
                 <p className="text-sm opacity-90">{card.title}</p>
-                <p className="mt-3 text-3xl font-semibold tracking-tight">
-                  {card.value}
-                </p>
+                <p className="mt-3 text-3xl font-semibold">{card.value}</p>
                 <p className="mt-1 text-sm opacity-90">{card.change}</p>
-
-                <p className="mt-3 text-xs uppercase tracking-wide opacity-80">
-                  {card.signal}
-                </p>
-
-                {/* Subtle shine */}
-                <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-10 bg-white" />
               </div>
             ))}
           </div>
@@ -81,86 +48,43 @@ export default function Page() {
 
         {/* Intelligence */}
         <section className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Performance Intelligence
-              </h2>
-              <span className="text-sm text-gray-500">Last 30 days</span>
-            </div>
-
-            <div className="flex h-64 flex-col items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 text-gray-600 transition">
-              <p className="font-medium">
-                Variance detected in regional performance
-              </p>
-              <p className="mt-1 text-sm text-gray-500">
-                North region underperformed baseline by 8%
-              </p>
+          <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-slate-800">
+            <h2 className="mb-2 text-lg font-semibold text-gray-800 dark:text-slate-200">
+              Performance Intelligence
+            </h2>
+            <div className="flex h-64 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">
+              Variance detected in regional performance
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md">
-            <h2 className="mb-4 text-lg font-semibold text-gray-800">
+          <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-slate-800">
+            <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
               Alerts & Risks
             </h2>
 
-            <ul className="space-y-4 text-sm">
-              <li className="flex items-start gap-2 transition hover:text-gray-900">
-                <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-700">
-                  Medium
-                </span>
-                <span>Revenue softness in North region</span>
-              </li>
-
-              <li className="flex items-start gap-2 transition hover:text-gray-900">
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-                  Positive
-                </span>
-                <span>Operational cost efficiency improving</span>
-              </li>
-
-              <li className="flex items-start gap-2 transition hover:text-gray-900">
-                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
-                  Watch
-                </span>
-                <span>Marketing ROI volatility detected</span>
-              </li>
+            <ul className="space-y-4 text-sm text-gray-700 dark:text-slate-300">
+              <li>Revenue softness in North region</li>
+              <li>Operational cost efficiency improving</li>
+              <li>Marketing ROI volatility detected</li>
             </ul>
           </div>
         </section>
 
         {/* Decisions */}
-        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 transition hover:shadow-md">
+        <section className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-slate-800">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-200">
               Recommended Decisions
             </h2>
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100">
+            <span className="rounded-full bg-emerald-50 dark:bg-emerald-950 px-3 py-1 text-sm font-medium text-emerald-700 dark:text-emerald-300">
               Confidence: High
             </span>
           </div>
 
-          <ul className="space-y-4 text-sm text-gray-700">
-            <li className="transition hover:text-gray-900">
-              → Increase inventory for top-selling SKU
-              <span className="ml-2 text-xs text-gray-500">
-                (Estimated impact: +₹42L)
-              </span>
-            </li>
-
-            <li className="transition hover:text-gray-900">
-              → Reallocate ad spend from low ROI campaigns
-              <span className="ml-2 text-xs text-gray-500">
-                (Risk reduction: Medium)
-              </span>
-            </li>
-
-            <li className="transition hover:text-gray-900">
-              → Renegotiate supplier contracts
-              <span className="ml-2 text-xs text-gray-500">
-                (Margin upside potential)
-              </span>
-            </li>
+          <ul className="space-y-4 text-sm text-gray-700 dark:text-slate-300">
+            <li>→ Increase inventory for top-selling SKU (Impact: +₹42L)</li>
+            <li>→ Reallocate ad spend from low ROI campaigns</li>
+            <li>→ Renegotiate supplier contracts</li>
           </ul>
         </section>
       </div>
