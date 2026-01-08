@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
@@ -8,24 +10,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, email, company, message, website } = body;
 
-    // 🛑 Honeypot protection
+    // 🛑 Honeypot
     if (website) {
       return NextResponse.json({ success: true });
     }
 
-    // 1️⃣ Store in DB
+    // 1️⃣ Save to DB
     await prisma.demoRequest.create({
-      data: {
-        name,
-        email,
-        company,
-        message,
-      },
+      data: { name, email, company, message },
     });
 
-    // 2️⃣ Send email ONLY if env vars exist
+    // 2️⃣ Send email ONLY at runtime
     if (process.env.RESEND_API_KEY && process.env.DEMO_REQUEST_EMAIL) {
-      const { Resend } = await import("resend"); // 🔑 dynamic import
+      const { Resend } = await import("resend");
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       await resend.emails.send({
@@ -38,17 +35,14 @@ export async function POST(req: Request) {
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Company:</strong> ${company || "-"}</p>
-          <p><strong>Message:</strong></p>
           <p>${message || "-"}</p>
         `,
       });
-    } else {
-      console.warn("Demo email skipped: missing env vars");
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("[request-demo]", error);
+  } catch (err) {
+    console.error("[request-demo]", err);
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }
