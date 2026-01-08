@@ -1,82 +1,11 @@
-/* ===============================
-   RENDERING & TEXT NORMALIZATION
-   =============================== */
+@import "tailwindcss";
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-/* Force crisp text & borders */
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+/* Optional global tweaks */
+html, body {
+  height: 100%;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  background: #ffffff;
-  color: #111827;
-}
-
-/* ===============================
-   FORM NORMALIZATION
-   =============================== */
-
-input,
-select,
-button,
-textarea {
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 1.4;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background-color: #ffffff;
-}
-
-/* Remove sub-pixel shifting */
-input,
-select,
-button {
-  transform: translateZ(0);
-}
-
-/* ===============================
-   BORDER & LINE CONSISTENCY
-   =============================== */
-
-hr,
-.card,
-input,
-select,
-button {
-  border-width: 1px;
-}
-
-/* ===============================
-   CANVAS (CHART) CLARITY
-   =============================== */
-
-canvas {
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
-}
-
-/* ===============================
-   HEADINGS
-   =============================== */
-
-h1,
-h2,
-h3,
-h4 {
-  line-height: 1.3;
+  background-color: #f8fafc;
 }
 
