@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import Sidebar from "./Sidebar";
@@ -13,9 +14,9 @@ export default async function DashboardLayout({
   // 1️⃣ Get session (SERVER-SIDE)
   const session = await getServerSession(authOptions);
 
-  // 2️⃣ Block unauthenticated users
+  // 2️⃣ Block unauthenticated users (SAFE REDIRECT)
   if (!session?.user?.email) {
-    throw new Error("Unauthorized");
+    redirect("/login");
   }
 
   // 3️⃣ Fetch user + organization
@@ -26,11 +27,12 @@ export default async function DashboardLayout({
     },
   });
 
+  // 4️⃣ Block invalid org state (SAFE REDIRECT)
   if (!user || !user.organization) {
-    throw new Error("Organization not found");
+    redirect("/login");
   }
 
-  // 4️⃣ Plan logic
+  // 5️⃣ Plan logic
   const plan = user.organization.plan; // "starter" | "growth"
   const isGrowth = plan === "growth";
 
