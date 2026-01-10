@@ -22,6 +22,7 @@ model Sale {
 model Organization {
   id        String   @id @default(cuid())
   name      String
+  plan      String   @default("starter")
   createdAt DateTime @default(now())
   sales     Sale[]
   users     User[]
@@ -36,6 +37,7 @@ model User {
   createdAt      DateTime     @default(now())
   organization   Organization @relation(fields: [organizationId], references: [id])
 }
+
 model DemoRequest {
   id        String   @id @default(cuid())
   name      String
