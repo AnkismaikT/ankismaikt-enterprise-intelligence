@@ -1,4 +1,23 @@
-export default function InsightsPage() {
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
+
+export default async function InsightsPage() {
+  // 🔐 SERVER PROTECTION
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) redirect("/login");
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    include: { organization: true },
+  });
+
+  if (!user || user.organization.plan !== "growth") {
+    redirect("/upgrade");
+  }
+
+  // ✅ UI (UNCHANGED)
   const insights = [
     {
       title: "Revenue Trend Analysis",
@@ -22,7 +41,6 @@ export default function InsightsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h2 className="text-2xl font-semibold text-gray-900">Insights</h2>
         <p className="mt-1 text-sm text-gray-600">
@@ -30,19 +48,16 @@ export default function InsightsPage() {
         </p>
       </div>
 
-      {/* Insight Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {insights.map((insight) => (
           <div
             key={insight.title}
             className="group relative flex flex-col justify-between rounded-xl border bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
           >
-            {/* Locked badge */}
             <span className="absolute right-4 top-4 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
               🔒 Locked
             </span>
 
-            {/* Content */}
             <div>
               <div className="text-2xl">{insight.icon}</div>
 
@@ -54,13 +69,11 @@ export default function InsightsPage() {
                 {insight.description}
               </p>
 
-              {/* Blurred preview */}
               <div className="mt-4 rounded bg-gray-100 p-3 text-xs text-gray-500 blur-sm">
                 Sample analytics output preview…
               </div>
             </div>
 
-            {/* CTA (Server-safe) */}
             <div
               title="This feature will be enabled during onboarding"
               className="mt-6 inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white opacity-80"
