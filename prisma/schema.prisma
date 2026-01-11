@@ -1,10 +1,41 @@
+// ===============================
+// Prisma Client Generator
+// ===============================
 generator client {
   provider = "prisma-client-js"
 }
 
+// ===============================
+// Datasource (Supabase / Postgres)
+// ===============================
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DATABASE_URL")
+}
+
+// ===============================
+// Models
+// ===============================
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  sales Sale[]
+  users User[]
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  password       String
+  role           String       @default("OWNER")
+  organizationId String
+  createdAt      DateTime     @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Sale {
@@ -16,26 +47,10 @@ model Sale {
   unitsSold      Int
   createdAt      DateTime     @default(now())
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  organization Organization @relation(fields: [organizationId], references: [id])
 }
 
-model Organization {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  sales     Sale[]
-  users     User[]
-}
-
-model User {
-  id             String       @id @default(cuid())
-  email          String       @unique
-  password       String
-  role           String       @default("OWNER")
-  organizationId String
-  createdAt      DateTime     @default(now())
-  organization   Organization @relation(fields: [organizationId], references: [id])
-}
 model DemoRequest {
   id        String   @id @default(cuid())
   name      String
