@@ -6,7 +6,7 @@ generator client {
 }
 
 // ===============================
-// Datasource (Supabase / Postgres)
+// Datasource (Supabase Postgres)
 // ===============================
 datasource db {
   provider   = "postgresql"
@@ -15,7 +15,7 @@ datasource db {
 }
 
 // ===============================
-// Models
+// Models (MATCHES SUPABASE DB)
 // ===============================
 
 model Organization {
@@ -23,43 +23,53 @@ model Organization {
   name      String
   createdAt DateTime @default(now())
 
-  sales Sale[]
-  users User[]
+  users   User[]
+  sales   Sale[]
+  invites Invite[]
 }
 
 model User {
-  id             String       @id @default(cuid())
-  email          String       @unique
+  id             String   @id @default(cuid())
+  email          String   @unique
   password       String
-  role           String       @default("OWNER")
+  role           String   @default("OWNER")
   organizationId String
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Sale {
-  id             Int          @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   date           DateTime
   region         String
   sku            String
   salesAmount    Float
   unitsSold      Int
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime @default(now())
   organizationId String
 
   organization Organization @relation(fields: [organizationId], references: [id])
 }
 
-model DemoRequest {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  company   String?
-  message   String?
-  createdAt DateTime @default(now())
+// ===============================
+// Invite System (NEW, CORRECT)
+// ===============================
+
+model Invite {
+  id             String   @id @default(cuid())
+  email          String
+  token          String   @unique
+  organizationId String
+  role           String   @default("MEMBER")
+  used           Boolean  @default(false)
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  usedAt         DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@index([email])
-  @@map("demo_requests")
+  @@index([token])
 }
 
