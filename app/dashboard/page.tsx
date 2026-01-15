@@ -1,4 +1,15 @@
+"use client";
+
 // app/dashboard/page.tsx
+
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 type SignalLevel = "high" | "medium" | "low";
 
@@ -6,6 +17,14 @@ const mockSignals: { level: SignalLevel; text: string }[] = [
   { level: "high", text: "Revenue softness detected in North region" },
   { level: "medium", text: "Marketing ROI volatility increasing" },
   { level: "low", text: "Operational cost efficiency improving" },
+];
+
+const chartData = [
+  { month: "Jan", revenue: 8.2, cost: 5.1 },
+  { month: "Feb", revenue: 9.4, cost: 5.6 },
+  { month: "Mar", revenue: 10.1, cost: 6.0 },
+  { month: "Apr", revenue: 11.2, cost: 6.4 },
+  { month: "May", revenue: 12.4, cost: 7.1 },
 ];
 
 export default function Page() {
@@ -79,7 +98,7 @@ export default function Page() {
             ].map((card) => (
               <div
                 key={card.title}
-                className={`relative rounded-2xl bg-gradient-to-r ${card.color} p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl`}
+                className={`rounded-2xl bg-gradient-to-r ${card.color} p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl`}
               >
                 <div className="flex items-center justify-between">
                   <p className="text-sm opacity-90">{card.title}</p>
@@ -103,17 +122,67 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ================= PERFORMANCE + ALERTS ================= */}
-        <section className="mb-14 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* ================= PERFORMANCE ================= */}
+        <section className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
             <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-slate-200">
               Performance Intelligence
             </h2>
-            <div className="flex h-64 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">
-              Variance detected in regional performance
+
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                >
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#6B7280", fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#6B7280", fontSize: 12 }}
+                    tickFormatter={(v) => `₹${v}L`}
+                  />
+                  <Tooltip
+                    formatter={(value: number) => [`₹${value}L`, ""]}
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderRadius: "12px",
+                      border: "1px solid #E5E7EB",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+                    }}
+                    labelStyle={{ fontWeight: 600 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    name="Revenue"
+                    stroke="#4f46e5"
+                    strokeWidth={3}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                    isAnimationActive
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="cost"
+                    name="Cost"
+                    stroke="#ef4444"
+                    strokeWidth={3}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                    isAnimationActive
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
+          {/* ================= ALERTS ================= */}
           <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
             <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
               Alerts & Risks
@@ -133,6 +202,70 @@ export default function Page() {
                 Marketing ROI volatility detected
               </li>
             </ul>
+          </div>
+        </section>
+
+        {/* ================= EXECUTIVE INSIGHT ================= */}
+        <section className="mb-14 rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
+          <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
+            Executive Insight
+          </h2>
+
+          <div className="space-y-5 text-sm text-gray-700 dark:text-slate-300">
+            <div>
+              <p className="font-medium text-gray-900 dark:text-slate-100">
+                Emerging Risk: Margin Pressure
+              </p>
+              <p className="mt-1">
+                Cost growth has exceeded revenue growth for two consecutive
+                months, indicating early signs of operating margin compression.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900 dark:text-slate-100">
+                Why this matters
+              </p>
+              <p className="mt-1">
+                If the current trend continues, operating margins may decline by
+                approximately <strong>1–1.3%</strong> next quarter, directly
+                impacting profitability and forecast reliability.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900 dark:text-slate-100">
+                Early warning signal
+              </p>
+              <p className="mt-1">
+                Operational costs in the North region are trending above
+                tolerance thresholds, driven by vendor and overhead expenses.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900 dark:text-slate-100">
+                Recommended decision
+              </p>
+              <p className="mt-1">
+                Freeze discretionary spending in the North region and initiate
+                renegotiation with the top two cost-intensive vendors.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-4 py-3">
+              <div>
+                <p className="font-medium text-emerald-900 dark:text-emerald-200">
+                  Estimated financial impact
+                </p>
+                <p className="text-emerald-800 dark:text-emerald-300">
+                  ₹38L – ₹55L protected over the next 90 days
+                </p>
+              </div>
+              <span className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                Confidence: High
+              </span>
+            </div>
           </div>
         </section>
 
