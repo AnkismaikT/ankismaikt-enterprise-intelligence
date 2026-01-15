@@ -1,9 +1,20 @@
+// app/dashboard/page.tsx
+
+type SignalLevel = "high" | "medium" | "low";
+
+const mockSignals: { level: SignalLevel; text: string }[] = [
+  { level: "high", text: "Revenue softness detected in North region" },
+  { level: "medium", text: "Marketing ROI volatility increasing" },
+  { level: "low", text: "Operational cost efficiency improving" },
+];
+
 export default function Page() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-6 py-8 transition-colors">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-6 py-8">
       <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-10">
+
+        {/* ================= HEADER ================= */}
+        <div className="mb-12">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-slate-100">
             AnkismaikT Enterprise Intelligence
           </h1>
@@ -21,35 +32,81 @@ export default function Page() {
           </div>
         </div>
 
-        {/* KPI Cards */}
-        <section className="mb-12">
-          <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
+        {/* ================= KPI CARDS ================= */}
+        <section className="mb-14">
+          <h2 className="mb-6 text-lg font-semibold text-gray-800 dark:text-slate-200">
             Key Performance Indicators
           </h2>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { title: "Revenue", value: "₹12.4L", change: "+14%", color: "from-indigo-500 to-indigo-600" },
-              { title: "Cost", value: "₹7.1L", change: "-6%", color: "from-rose-500 to-rose-600" },
-              { title: "Profit", value: "₹5.3L", change: "+22%", color: "from-emerald-500 to-emerald-600" },
-              { title: "Growth", value: "+18%", change: "QoQ", color: "from-amber-500 to-amber-600" },
+              {
+                title: "Revenue",
+                value: "₹12.4L",
+                change: "+14%",
+                trend: "▲",
+                status: "On Track",
+                icon: "💰",
+                color: "from-indigo-500 to-indigo-600",
+              },
+              {
+                title: "Cost",
+                value: "₹7.1L",
+                change: "-6%",
+                trend: "▼",
+                status: "Improving",
+                icon: "📉",
+                color: "from-rose-500 to-rose-600",
+              },
+              {
+                title: "Profit",
+                value: "₹5.3L",
+                change: "+22%",
+                trend: "▲",
+                status: "Strong",
+                icon: "📈",
+                color: "from-emerald-500 to-emerald-600",
+              },
+              {
+                title: "Growth",
+                value: "+18%",
+                change: "QoQ",
+                trend: "▲",
+                status: "Accelerating",
+                icon: "🚀",
+                color: "from-amber-500 to-amber-600",
+              },
             ].map((card) => (
               <div
                 key={card.title}
-                className={`rounded-2xl bg-gradient-to-r ${card.color} p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl`}
+                className={`relative rounded-2xl bg-gradient-to-r ${card.color} p-6 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl`}
               >
-                <p className="text-sm opacity-90">{card.title}</p>
-                <p className="mt-3 text-3xl font-semibold">{card.value}</p>
-                <p className="mt-1 text-sm opacity-90">{card.change}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm opacity-90">{card.title}</p>
+                  <span className="text-xl">{card.icon}</span>
+                </div>
+
+                <p className="mt-4 text-3xl font-semibold">
+                  {card.value}
+                </p>
+
+                <div className="mt-3 flex items-center justify-between text-sm opacity-90">
+                  <span>
+                    {card.trend} {card.change}
+                  </span>
+                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                    {card.status}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Intelligence */}
-        <section className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-slate-800">
-            <h2 className="mb-2 text-lg font-semibold text-gray-800 dark:text-slate-200">
+        {/* ================= PERFORMANCE + ALERTS ================= */}
+        <section className="mb-14 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
+            <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-slate-200">
               Performance Intelligence
             </h2>
             <div className="flex h-64 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">
@@ -57,21 +114,59 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-slate-800">
+          <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
             <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
               Alerts & Risks
             </h2>
 
-            <ul className="space-y-4 text-sm text-gray-700 dark:text-slate-300">
-              <li>Revenue softness in North region</li>
-              <li>Operational cost efficiency improving</li>
-              <li>Marketing ROI volatility detected</li>
+            <ul className="space-y-4 text-sm">
+              <li className="flex gap-3">
+                <span className="h-2 w-2 mt-2 rounded-full bg-red-500" />
+                Revenue softness in North region
+              </li>
+              <li className="flex gap-3">
+                <span className="h-2 w-2 mt-2 rounded-full bg-emerald-500" />
+                Operational cost efficiency improving
+              </li>
+              <li className="flex gap-3">
+                <span className="h-2 w-2 mt-2 rounded-full bg-yellow-500" />
+                Marketing ROI volatility detected
+              </li>
             </ul>
           </div>
         </section>
 
-        {/* Decisions */}
-        <section className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-slate-800">
+        {/* ================= SIGNALS ================= */}
+        <section className="mb-14 rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
+          <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-slate-200">
+            Signals
+          </h2>
+
+          <ul className="space-y-3">
+            {mockSignals.map((signal, idx) => (
+              <li
+                key={idx}
+                className={`flex items-center justify-between rounded-lg border-l-4 px-4 py-3 ${
+                  signal.level === "high"
+                    ? "border-red-500 bg-red-50 dark:bg-red-950/30"
+                    : signal.level === "medium"
+                    ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/30"
+                    : "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                }`}
+              >
+                <span className="text-sm text-gray-800 dark:text-slate-200">
+                  {signal.text}
+                </span>
+                <span className="text-xs font-semibold uppercase opacity-70">
+                  {signal.level}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ================= DECISIONS ================= */}
+        <section className="rounded-2xl bg-white dark:bg-slate-900 p-6 ring-1 ring-gray-200 dark:ring-slate-800">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-200">
               Recommended Decisions
@@ -81,12 +176,13 @@ export default function Page() {
             </span>
           </div>
 
-          <ul className="space-y-4 text-sm text-gray-700 dark:text-slate-300">
+          <ul className="space-y-4 text-sm">
             <li>→ Increase inventory for top-selling SKU (Impact: +₹42L)</li>
             <li>→ Reallocate ad spend from low ROI campaigns</li>
             <li>→ Renegotiate supplier contracts</li>
           </ul>
         </section>
+
       </div>
     </main>
   );
