@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,10 +11,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+/* ================= TYPES ================= */
 type Row = {
   month: string;
   revenue: number;
   cost: number;
+  sku?: string;
+  region?: string;
 };
 
 export default function SalesAnalyticsPage() {
@@ -22,19 +25,39 @@ export default function SalesAnalyticsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
+  /* FILTER STATE */
+  const [selectedRegion, setSelectedRegion] = useState("ALL");
+  const [selectedSKU, setSelectedSKU] = useState("ALL");
+
+  /* FILE INPUT REF */
+  const fileRef = useRef<HTMLInputElement>(null);
+
   /* ================= CSV UPLOAD ================= */
   function handleCSV(file: File) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const lines = text.trim().split("\n").slice(1);
+
+      const allLines = text.trim().split("\n");
+      const headers = allLines[0]
+        .split(",")
+        .map((h) => h.trim().toLowerCase());
+      const lines = allLines.slice(1);
 
       const parsed: Row[] = lines.map((l) => {
-        const [month, revenue, cost] = l.split(",");
+        const values = l.split(",");
+        const row: any = {};
+
+        headers.forEach((h, i) => {
+          row[h] = values[i];
+        });
+
         return {
-          month,
-          revenue: Number(revenue),
-          cost: Number(cost),
+          month: row.month,
+          revenue: Number(row.revenue),
+          cost: Number(row.cost),
+          sku: row.sku,
+          region: row.region,
         };
       });
 
@@ -43,13 +66,70 @@ export default function SalesAnalyticsPage() {
     reader.readAsText(file);
   }
 
+  /* ================= FILTER OPTIONS ================= */
+  const regions = Array.from(
+    new Set(rows.map((r) => r.region).filter(Boolean))
+  ) as string[];
+
+  const skus = Array.from(
+    new Set(rows.map((r) => r.sku).filter(Boolean))
+  ) as string[];
+
+  const filteredRows = rows.filter((r) => {
+    const regionMatch =
+      selectedRegion === "ALL" || r.region === selectedRegion;
+    const skuMatch = selectedSKU === "ALL" || r.sku === selectedSKU;
+    return regionMatch && skuMatch;
+  });
+
   /* ================= KPIs ================= */
-  const totalRevenue = rows.reduce((s, r) => s + r.revenue, 0);
-  const totalCost = rows.reduce((s, r) => s + r.cost, 0);
+  const totalRevenue = filteredRows.reduce((s, r) => s + r.revenue, 0);
+  const totalCost = filteredRows.reduce((s, r) => s + r.cost, 0);
   const margin =
     totalRevenue > 0
       ? (((totalRevenue - totalCost) / totalRevenue) * 100).toFixed(1)
       : "0";
+
+  /* ================= SKU ANALYSIS ================= */
+  const skuMap: Record<string, number> = {};
+  filteredRows
+    .filter((r) => r.sku)
+    .forEach((r) => {
+      const key = r.sku as string;
+      skuMap[key] = (skuMap[key] || 0) + r.revenue;
+    });
+
+  const skuDependency = Object.entries(skuMap)
+    .map(([sku, revenue]) => ({
+      sku,
+      revenue,
+      dependency: totalRevenue
+        ? ((revenue / totalRevenue) * 100).toFixed(1)
+        : "0",
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  /* ================= REGION ANALYSIS ================= */
+  const regionMap: Record<string, number> = {};
+  filteredRows
+    .filter((r) => r.region)
+    .forEach((r) => {
+      const key = r.region as string;
+      regionMap[key] = (regionMap[key] || 0) + r.revenue;
+    });
+
+  const regionDependency = Object.entries(regionMap)
+    .map(([region, revenue]) => ({
+      region,
+      revenue,
+      dependency: totalRevenue
+        ? ((revenue / totalRevenue) * 100).toFixed(1)
+        : "0",
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  const getRisk = (d: number) =>
+    d > 50 ? "HIGH" : d >= 30 ? "MEDIUM" : "LOW";
 
   /* ================= UI ================= */
   return (
@@ -61,12 +141,12 @@ export default function SalesAnalyticsPage() {
             Sales Analytics
           </h1>
           <p className="text-slate-600">
-            CFO view of revenue, cost, and margin trends
+            CFO view of revenue, cost, margin & concentration risk
           </p>
         </div>
 
         {/* FILTER BAR */}
-        <div className="rounded-xl border bg-white p-4 grid gap-4 md:grid-cols-5">
+        <div className="rounded-xl border bg-white p-4 grid gap-4 md:grid-cols-7 items-end">
           <input
             type="date"
             value={fromDate}
@@ -80,21 +160,51 @@ export default function SalesAnalyticsPage() {
             className="rounded border px-3 py-2"
           />
 
-          <div className="md:col-span-2">
-            <label className="block text-sm text-slate-500 mb-1">
-              Upload CSV
-            </label>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) =>
-                e.target.files && handleCSV(e.target.files[0])
-              }
-              className="w-full text-sm"
-            />
-          </div>
+          <select
+            value={selectedRegion}
+            onChange={(e) => setSelectedRegion(e.target.value)}
+            className="rounded border px-3 py-2"
+          >
+            <option value="ALL">All Regions</option>
+            {regions.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
 
-          <button className="rounded bg-black text-white px-4 py-2 self-end">
+          <select
+            value={selectedSKU}
+            onChange={(e) => setSelectedSKU(e.target.value)}
+            className="rounded border px-3 py-2"
+          >
+            <option value="ALL">All SKUs</option>
+            {skus.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+
+          {/* HIDDEN FILE INPUT */}
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={(e) =>
+              e.target.files && handleCSV(e.target.files[0])
+            }
+          />
+
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="rounded-lg bg-indigo-600 text-white px-4 py-2 font-medium"
+          >
+            Upload CSV
+          </button>
+
+          <button className="rounded-lg bg-black text-white px-4 py-2 font-medium">
             Apply
           </button>
         </div>
@@ -106,55 +216,17 @@ export default function SalesAnalyticsPage() {
           <KPI label="Margin %" value={`${margin}%`} />
         </div>
 
-        {/* EXECUTIVE SIGNALS */}
-        <div className="rounded-xl border bg-white p-6 space-y-4">
-          <h2 className="text-lg font-semibold">
-            Executive Sales Signals
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <Signal
-              label="Revenue Trend"
-              value={rows.length ? "Growing" : "No Data"}
-              status={rows.length ? "positive" : "neutral"}
-            />
-            <Signal
-              label="Cost Trend"
-              value={
-                totalCost / (totalRevenue || 1) > 0.65
-                  ? "Rising Fast"
-                  : "Controlled"
-              }
-              status={
-                totalCost / (totalRevenue || 1) > 0.65
-                  ? "warning"
-                  : "positive"
-              }
-            />
-            <Signal
-              label="Margin Pressure"
-              value={Number(margin) < 30 ? "High" : "Moderate"}
-              status={Number(margin) < 30 ? "warning" : "positive"}
-            />
-          </div>
-
-          <p className="text-sm text-slate-700">
-            <strong>CFO insight:</strong> Costs are rising faster than
-            revenue, resulting in sustained margin compression.
-          </p>
-        </div>
-
         {/* CHART */}
         <div className="rounded-xl border bg-white p-6">
           <h3 className="mb-3 font-semibold">Revenue vs Cost Trend</h3>
 
-          {rows.length === 0 ? (
+          {filteredRows.length === 0 ? (
             <p className="text-sm text-slate-500">
               Upload a CSV to view charts.
             </p>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={rows}>
+              <LineChart data={filteredRows}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
@@ -175,6 +247,98 @@ export default function SalesAnalyticsPage() {
             </ResponsiveContainer>
           )}
         </div>
+
+        {/* SKU TABLE */}
+        {skuDependency.length > 0 && (
+          <div className="rounded-xl border bg-white p-6">
+            <h3 className="font-semibold mb-3">
+              SKU Revenue Dependency & Risk
+            </h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="py-2">SKU</th>
+                  <th className="py-2">Revenue</th>
+                  <th className="py-2">Dependency %</th>
+                  <th className="py-2">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                {skuDependency.map((s) => {
+                  const risk = getRisk(Number(s.dependency));
+                  return (
+                    <tr key={s.sku} className="border-b last:border-none">
+                      <td className="py-2 font-medium">{s.sku}</td>
+                      <td className="py-2">
+                        ₹{s.revenue.toLocaleString()}
+                      </td>
+                      <td className="py-2">{s.dependency}%</td>
+                      <td className="py-2">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-semibold ${
+                            risk === "HIGH"
+                              ? "bg-red-100 text-red-700"
+                              : risk === "MEDIUM"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {risk}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* REGION TABLE */}
+        {regionDependency.length > 0 && (
+          <div className="rounded-xl border bg-white p-6">
+            <h3 className="font-semibold mb-3">
+              Region Revenue Concentration & Risk
+            </h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left">
+                  <th className="py-2">Region</th>
+                  <th className="py-2">Revenue</th>
+                  <th className="py-2">Dependency %</th>
+                  <th className="py-2">Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                {regionDependency.map((r) => {
+                  const risk = getRisk(Number(r.dependency));
+                  return (
+                    <tr key={r.region} className="border-b last:border-none">
+                      <td className="py-2 font-medium">{r.region}</td>
+                      <td className="py-2">
+                        ₹{r.revenue.toLocaleString()}
+                      </td>
+                      <td className="py-2">{r.dependency}%</td>
+                      <td className="py-2">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-semibold ${
+                            risk === "HIGH"
+                              ? "bg-red-100 text-red-700"
+                              : risk === "MEDIUM"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {risk}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </main>
   );
@@ -186,30 +350,6 @@ function KPI({ label, value }: { label: string; value: string }) {
     <div className="rounded-xl border bg-white p-6">
       <p className="text-sm text-slate-500">{label}</p>
       <p className="text-2xl font-semibold">{value}</p>
-    </div>
-  );
-}
-
-function Signal({
-  label,
-  value,
-  status,
-}: {
-  label: string;
-  value: string;
-  status: "positive" | "warning" | "neutral";
-}) {
-  const color =
-    status === "positive"
-      ? "text-emerald-600"
-      : status === "warning"
-      ? "text-amber-600"
-      : "text-slate-600";
-
-  return (
-    <div className="rounded-lg border p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className={`mt-1 font-semibold ${color}`}>{value}</p>
     </div>
   );
 }
