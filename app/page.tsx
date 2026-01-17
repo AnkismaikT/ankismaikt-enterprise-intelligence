@@ -62,7 +62,7 @@ export default function HomePage() {
           </p>
 
           {/* ACTIONS */}
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-wrap gap-4">
             <button
               type="button"
               onClick={() => {
@@ -83,6 +83,14 @@ export default function HomePage() {
             >
               View Product Preview
             </button>
+
+            {/* LOGIN BUTTON — ONLY ADDITION */}
+            <a
+              href="/login"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            >
+              🚀 Login
+            </a>
           </div>
         </section>
 
