@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,19 +13,10 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const result = await signIn("credentials", {
+    await signIn("credentials", {
       email,
-      redirect: false, // IMPORTANT
+      callbackUrl: "/dashboard", // ✅ DEFAULT LANDING PAGE
     });
-
-    if (result?.error) {
-      setError("Invalid email or user not found");
-      setLoading(false);
-      return;
-    }
-
-    // ✅ MANUAL REDIRECT (RELIABLE)
-    router.push("/analytics");
   }
 
   return (
