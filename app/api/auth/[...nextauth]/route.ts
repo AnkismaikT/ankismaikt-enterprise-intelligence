@@ -3,37 +3,54 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/src/lib/prisma";
 
-const OWNER_EMAIL = "pradeepmeghwal0411@gmail.com";
-
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+
   session: {
     strategy: "jwt",
   },
+
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "Owner Login",
+
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.email) return null;
 
-        // 🔐 OWNER-ONLY LOGIN ENFORCEMENT
-        if (credentials.email !== OWNER_EMAIL) {
-          throw new Error("Access denied");
+      async authorize(credentials) {
+        // 1️⃣ Get email defensively
+        const rawEmail =
+          credentials?.email ||
+          (credentials as any)?.username ||
+          (credentials as any)?.emailAddress;
+
+        if (!rawEmail) return null;
+
+        const email = rawEmail.trim().toLowerCase();
+        const ownerEmail = process.env.OWNER_EMAIL?.trim().toLowerCase();
+
+        if (!ownerEmail) {
+          throw new Error("OWNER_EMAIL is not configured");
         }
 
+        // 2️⃣ Enforce owner-only access
+        if (email !== ownerEmail) {
+          return null;
+        }
+
+        // 3️⃣ Fetch owner user from DB
         const user = await prisma.user.findUnique({
-          where: { email: OWNER_EMAIL },
+          where: { email: ownerEmail },
           include: { organization: true },
         });
 
         if (!user) {
-          throw new Error("Owner user not found");
+          // Owner exists in env but not in DB
+          throw new Error("Owner user not found in database");
         }
 
+        // 4️⃣ Return safe user object
         return {
           id: user.id,
           email: user.email,
@@ -44,6 +61,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -52,6 +70,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).organizationId = token.organizationId;
@@ -60,9 +79,12 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+
   pages: {
     signIn: "/login",
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
