@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/src/lib/prisma";
 
+const OWNER_EMAIL = "pradeepmeghwal0411@gmail.com";
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -18,12 +20,19 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email) return null;
 
+        // 🔐 OWNER-ONLY LOGIN ENFORCEMENT
+        if (credentials.email !== OWNER_EMAIL) {
+          throw new Error("Access denied");
+        }
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: OWNER_EMAIL },
           include: { organization: true },
         });
 
-        if (!user) return null;
+        if (!user) {
+          throw new Error("Owner user not found");
+        }
 
         return {
           id: user.id,
